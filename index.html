@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flores Amarillas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Great Vibes, Playfair Display & Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Custom Typography */
+        .font-cursive {
+            font-family: 'Great Vibes', cursive;
+        }
+        .font-serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #31103f 25%, #451a03 60%, #78350f 85%, #9a3412 100%);
+            background-attachment: fixed;
+        }
+
+        /* Glowing text & card effects */
+        .glow-text-gold {
+            text-shadow: 0 0 12px rgba(254, 240, 138, 0.7), 0 0 25px rgba(234, 179, 8, 0.5);
+        }
+        .glow-card {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 35px rgba(250, 204, 21, 0.25);
+            border: 1px solid rgba(254, 240, 138, 0.35);
+        }
+
+        /* Flower animations */
+        @keyframes stemGrow {
+            0% {
+                stroke-dashoffset: 200;
+                opacity: 0;
+            }
+            100% {
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+        }
+        @keyframes bloomPetals {
+            0% {
+                transform: scale(0) rotate(-30deg);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.15) rotate(5deg);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        @keyframes leafPop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Ambient floating particles & butterflies */
+        @keyframes floatDust {
+            0% {
+                transform: translateY(0px) translateX(0px) scale(0.8);
+                opacity: 0.2;
+            }
+            50% {
+                transform: translateY(-80px) translateX(25px) scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-160px) translateX(-20px) scale(0.4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes butterflyFlap {
+            0%, 100% { transform: scaleX(1) rotate(0deg); }
+            50% { transform: scaleX(0.3) rotate(8deg); }
+        }
+
+        @keyframes butterflyFloat {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(40px, -60px) rotate(10deg); }
+            66% { transform: translate(-30px, -120px) rotate(-10deg); }
+            100% { transform: translate(0, -180px) rotate(0deg); }
+        }
+
+        .animated-stem {
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: stemGrow 1.8s ease-out forwards;
+        }
+
+        .animated-petals {
+            transform-origin: 50px 50px;
+            animation: bloomPetals 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation-delay: 1.2s;
+            opacity: 0;
+        }
+
+        .animated-leaf {
+            transform-origin: center;
+            animation: leafPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation-delay: 1s;
+            opacity: 0;
+        }
+
+        .gold-particle {
+            position: absolute;
+            background: radial-gradient(circle, #fef08a 0%, #facc15 60%, rgba(234, 179, 8, 0) 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatDust infinite ease-in-out;
+        }
+
+        .butterfly {
+            position: absolute;
+            pointer-events: none;
+            z-index: 15;
+            animation: butterflyFloat 12s infinite ease-in-out;
+        }
+        .butterfly-wing {
+            animation: butterflyFlap 0.4s infinite ease-in-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #facc15;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-amber-50 overflow-x-hidden relative flex flex-col justify-between selection:bg-amber-400 selection:text-amber-950">
+
+    <!-- Golden Light Orbs / Background Ambient FX -->
+    <div id="ambient-particles" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- Butterflies Layer -->
+    <div id="butterfly-layer" class="fixed inset-0 pointer-events-none z-10 overflow-hidden"></div>
+
+    <!-- Centerpiece Hero: Friendship Gratitude Card Dedicated to Ilsen -->
+    <main class="relative z-20 flex-grow flex items-center justify-center p-4 sm:p-6 my-auto">
+        <div id="hero-card" class="glow-card bg-slate-950/60 backdrop-blur-xl p-8 sm:p-12 rounded-3xl text-center max-w-xl w-full border border-yellow-300/35 transform transition-all duration-700 hover:scale-[1.01]">
+            
+            <!-- Central Title with Name -->
+            <h1 id="card-title" class="font-cursive text-6xl sm:text-7xl md:text-8xl text-yellow-300 glow-text-gold mb-3 leading-none">
+                Para ti, Ilsen
+            </h1>
+
+            <!-- Friendship Gratitude Message -->
+            <p id="card-subtitle" class="font-serif-title italic text-amber-100/90 text-lg sm:text-xl md:text-2xl font-normal leading-relaxed mt-4">
+                "Gracias por tu amistad sincera, por estar siempre ahí. Un detalle en forma de flores amarillas para iluminar tu día y agradecer el haberte conocido."
+            </p>
+
+            <div class="w-24 h-0.5 bg-gradient-to-r from-transparent via-yellow-400/60 to-transparent mx-auto my-6"></div>
+
+            <p class="text-xs sm:text-sm text-amber-200/60 font-light tracking-wider uppercase">
+                ✨ Haz clic en la pantalla para sembrar más flores ✨
+            </p>
+        </div>
+    </main>
+
+    <!-- Bottom Garden Layer (Auto-Growing Flowers SVG Container) -->
+    <div id="garden-container" class="fixed inset-0 pointer-events-none z-10 flex items-end justify-around px-2 sm:px-12 pb-0 overflow-hidden">
+        <!-- SVG flowers are dynamically injected here -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative z-30 text-center py-4 text-xs text-amber-200/40 font-light">
+        Un detalle lleno de luz en agradecimiento por tu amistad
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // SVG Definitions for Blooming Yellow Flowers
+        const flowerSVGStyles = [
+            // Style 1: Glowing Sunflower
+            (size, delay) => `
+                <svg width="${size}" height="${size * 2.2}" viewBox="0 0 100 220" fill="none" class="drop-shadow-[0_10px_15px_rgba(250,204,21,0.3)]">
+                    <!-- Stem -->
+                    <path class="animated-stem" style="animation-delay: ${delay}s;" d="M50 100 Q45 160 50 220" stroke="#22c55e" stroke-width="4.5" stroke-linecap="round"/>
+                    <!-- Leaves -->
+                    <path class="animated-leaf" style="animation-delay: ${delay + 0.8}s;" d="M48 150 Q25 140 20 155 Q32 170 49 160" fill="#16a34a" />
+                    <path class="animated-leaf" style="animation-delay: ${delay + 1.0}s;" d="M52 175 Q75 165 80 180 Q68 195 51 185" fill="#15803d" />
+                    
+                    <!-- Petals Bloom -->
+                    <g class="animated-petals" style="animation-delay: ${delay + 1.2}s;">
+                        ${Array.from({length: 12}, (_, i) => `
+                            <ellipse cx="50" cy="25" rx="9" ry="26" transform="rotate(${i * 30} 50 50)" fill="url(#sunGrad)" />
+                        `).join('')}
+                        <!-- Core -->
+                        <circle cx="50" cy="50" r="16" fill="url(#coreGrad)" />
+                        <circle cx="50" cy="50" r="12" fill="#78350f" opacity="0.8"/>
+                    </g>
+                    <defs>
+                        <linearGradient id="sunGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#fef08a"/>
+                            <stop offset="60%" stop-color="#facc15"/>
+                            <stop offset="100%" stop-color="#eab308"/>
+                        </linearGradient>
+                        <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#b45309"/>
+                            <stop offset="100%" stop-color="#451a03"/>
+                        </radialGradient>
+                    </defs>
+                </svg>
+            `,
+            // Style 2: Elegant Yellow Daisy / Flower
+            (size, delay) => `
+                <svg width="${size}" height="${size * 2.2}" viewBox="0 0 100 220" fill="none" class="drop-shadow-[0_10px_15px_rgba(250,204,21,0.25)]">
+                    <!-- Stem -->
+                    <path class="animated-stem" style="animation-delay: ${delay}s;" d="M50 90 Q58 155 50 220" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+                    <!-- Leaves -->
+                    <path class="animated-leaf" style="animation-delay: ${delay + 0.7}s;" d="M52 140 Q70 128 76 142 Q64 158 50 148" fill="#16a34a" />
+                    <path class="animated-leaf" style="animation-delay: ${delay + 0.9}s;" d="M48 170 Q30 160 24 172 Q36 186 49 178" fill="#15803d" />
+
+                    <!-- Petals -->
+                    <g class="animated-petals" style="animation-delay: ${delay + 1.1}s;">
+                        ${Array.from({length: 8}, (_, i) => `
+                            <ellipse cx="50" cy="26" rx="12" ry="24" transform="rotate(${i * 45} 50 50)" fill="url(#roseGrad)" />
+                        `).join('')}
+                        <circle cx="50" cy="50" r="14" fill="#fef08a"/>
+                        <circle cx="50" cy="50" r="9" fill="#facc15"/>
+                    </g>
+                    <defs>
+                        <linearGradient id="roseGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="30%" stop-color="#fef08a"/>
+                            <stop offset="100%" stop-color="#ca8a04"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            `
+        ];
+
+        // Automatic Sequenced Garden Initializer
+        function growAutomaticGarden() {
+            const container = document.getElementById('garden-container');
+            const flowerCount = window.innerWidth < 640 ? 6 : 10; // Responsive density
+
+            for (let i = 0; i < flowerCount; i++) {
+                const flowerDiv = document.createElement('div');
+                flowerDiv.className = 'pointer-events-auto cursor-pointer transform hover:scale-105 transition-transform duration-300';
+                
+                const size = Math.floor(Math.random() * 30) + (window.innerWidth < 640 ? 90 : 130);
+                const styleIndex = i % flowerSVGStyles.length;
+                const delay = i * 0.35; // Staggered bloom timing
+
+                flowerDiv.innerHTML = flowerSVGStyles[styleIndex](size, delay);
+                
+                // Click interaction on individual flowers
+                flowerDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    spawnSparkleCluster(e.clientX, e.clientY);
+                });
+
+                container.appendChild(flowerDiv);
+            }
+        }
+
+        // Spawn interactive flowers anywhere user clicks/touches
+        document.body.addEventListener('click', (e) => {
+            spawnExtraFlower(e.clientX, e.clientY);
+            spawnSparkleCluster(e.clientX, e.clientY);
+        });
+
+        function spawnExtraFlower(x, y) {
+            const extraContainer = document.createElement('div');
+            extraContainer.className = 'fixed pointer-events-auto cursor-pointer z-15 transform -translate-x-1/2 -translate-y-full';
+            extraContainer.style.left = `${x}px`;
+            extraContainer.style.top = `${y + 40}px`;
+
+            const size = Math.floor(Math.random() * 25) + 85;
+            const styleIndex = Math.floor(Math.random() * flowerSVGStyles.length);
+            
+            extraContainer.innerHTML = flowerSVGStyles[styleIndex](size, 0);
+
+            extraContainer.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                spawnSparkleCluster(ev.clientX, ev.clientY);
+            });
+
+            document.body.appendChild(extraContainer);
+        }
+
+        // Floating Gold Sparkles
+        function spawnSparkleCluster(x, y) {
+            for (let i = 0; i < 8; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'fixed z-50 pointer-events-none text-yellow-300 text-sm animate-ping';
+                spark.innerHTML = '✨';
+                spark.style.left = `${x + (Math.random() * 60 - 30)}px`;
+                spark.style.top = `${y + (Math.random() * 60 - 30)}px`;
+                document.body.appendChild(spark);
+
+                setTimeout(() => spark.remove(), 800);
+            }
+        }
+
+        // Ambient Gold Particles
+        function initGoldDust() {
+            const container = document.getElementById('ambient-particles');
+            const particleCount = 28;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'gold-particle';
+                const size = Math.random() * 6 + 3;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDuration = `${Math.random() * 4 + 4}s`;
+                particle.style.animationDelay = `${Math.random() * 3}s`;
+                container.appendChild(particle);
+            }
+        }
+
+        // Butterflies
+        function initButterflies() {
+            const container = document.getElementById('butterfly-layer');
+            const count = 3;
+
+            for (let i = 0; i < count; i++) {
+                const b = document.createElement('div');
+                b.className = 'butterfly';
+                b.style.left = `${20 + i * 30}%`;
+                b.style.top = `${60 + (i % 2) * 20}%`;
+                b.style.animationDelay = `${i * 3}s`;
+
+                b.innerHTML = `
+                    <div class="butterfly-wing text-yellow-300 text-2xl filter drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]">
+                        🦋
+                    </div>
+                `;
+                container.appendChild(b);
+            }
+        }
+
+        // Initialize on Page Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initGoldDust();
+            initButterflies();
+            growAutomaticGarden();
+        });
+    </script>
+</body>
+</html>
